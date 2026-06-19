@@ -1,4 +1,10 @@
+using Dsw2026Ej15.Domain.Interfaces;
+using Dsw2026Ej15.Data;
+using Dsw2026Ej15.Api.Middlewares;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
 
 // Add services to the container.
 
@@ -7,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -7,7 +7,7 @@ namespace Dsw2026Ej15.Domain.Interfaces;
     public interface IPersistence
 {
     List<Speciality> GetAllSpecialities();
-    Speciality? GetSpecialityByld(Guid id);
+    Speciality? GetSpecialityById(Guid id);
     List<Doctor> GetAllDoctors();
     Doctor? GetDoctorById(Guid id);
     void AddDoctor(Doctor doctor);
