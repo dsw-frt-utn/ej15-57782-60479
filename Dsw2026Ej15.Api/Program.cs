@@ -1,10 +1,14 @@
 using Dsw2026Ej15.Domain.Interfaces;
 using Dsw2026Ej15.Data;
 using Dsw2026Ej15.Api.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IPersistence, PersistenceEf>();
 
 // Add services to the container.
 
