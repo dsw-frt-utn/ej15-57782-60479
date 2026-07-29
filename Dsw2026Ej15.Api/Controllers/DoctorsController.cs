@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Dsw2026Ej15.Domain.Entities;
-using Dsw2026Ej15.Domain.Interfaces;
+﻿using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Domain.Exceptions;
+using Dsw2026Ej15.Domain.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using static Dsw2026Ej15.Api.Models.DoctorModel;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
     private readonly IPersistence _persistence;
@@ -17,20 +19,19 @@ public class DoctorsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateDoctor([FromBody] Doctor doctor)
+    public IActionResult CreateDoctor([FromBody] Request request)
     {
-        if (string.IsNullOrWhiteSpace(doctor.Name))
+        if (string.IsNullOrWhiteSpace(request.Name))
             throw new ValidationException("El nombre del médico es un campo obligatorio.");
 
-        if (doctor.Speciality == null || doctor.Speciality.Id == Guid.Empty)
-            throw new ValidationException("La especialidad del médico es obligatoria.");
+        if (string.IsNullOrWhiteSpace(request.LicenseNumber))
+            throw new ValidationException("El número de matrícula es un campo obligatorio.");
 
-        var existingSpeciality = _persistence.GetSpecialityById(doctor.Speciality.Id);
-        if (existingSpeciality == null)
-            throw new ValidationException($"No se encontró la especialidad con el Id {doctor.Speciality.Id}.");
+        var speciality = _persistence.GetSpecialityById(request.SpecialityId);
+        if (speciality == null)
+            throw new ValidationException($"No se encontró la especialidad con el Id {request.SpecialityId}.");
 
-        doctor.Speciality = existingSpeciality;
-        doctor.IsActive = true;
+        var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
 
         _persistence.AddDoctor(doctor);
 
@@ -40,7 +41,7 @@ public class DoctorsController : ControllerBase
     [HttpGet]
     public IActionResult GetDoctors()
     {
-        var doctors = _persistence.GetAllDoctors();
+        var doctors = _persistence.GetAllDoctors().Where(d => d.IsActive);
         return Ok(doctors);
     }
 
@@ -49,12 +50,13 @@ public class DoctorsController : ControllerBase
     {
         var doctor = _persistence.GetDoctorById(id);
 
-        if (doctor == null)
+        if (doctor == null || !doctor.IsActive)
         {
-            return NotFound(new { message = $"No se encontró ningún médico con el Id {id}" });
+            return NotFound(new { message = $"No se encontró ningún médico activo con el Id {id}" });
         }
 
-        return Ok(doctor);
+        var response = new Response(doctor.Name, doctor.LicenseNumber, doctor.Speciality.Name);
+        return Ok(response);
     }
 
     [HttpDelete("{id}")]
@@ -62,13 +64,12 @@ public class DoctorsController : ControllerBase
     {
         var doctor = _persistence.GetDoctorById(id);
 
-        if (doctor == null)
+        if (doctor == null || !doctor.IsActive)
         {
-            return NotFound(new { message = $"No se encontró ningún médico con el Id {id}" });
+            return NotFound(new { message = $"No se encontró ningún médico activo con el Id {id}" });
         }
 
         doctor.IsActive = false;
-
         _persistence.UpdateDoctor(doctor);
 
         return NoContent();
