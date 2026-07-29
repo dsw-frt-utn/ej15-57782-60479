@@ -34,7 +34,7 @@ public class PersistenceInMemory : IPersistence
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error crítico al cargar JSON: {ex.Message}");
+            Console.WriteLine($"Error al cargar JSON: {ex.Message}");
         }
     }
 
