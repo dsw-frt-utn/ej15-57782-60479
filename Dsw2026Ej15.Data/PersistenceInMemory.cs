@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Dsw2026Ej15.Data.Dtos;
 using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Domain.Interfaces;
 
@@ -13,16 +14,22 @@ public class PersistenceInMemory : IPersistence
     {
         LoadSpecialities();
     }
+
     private void LoadSpecialities()
     {
         try
         {
-            var json = File.ReadAllText("specialities.json");
+            var path = Path.Combine(AppContext.BaseDirectory, "specialities.json");
+            var json = File.ReadAllText(path);
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var specialities = JsonSerializer.Deserialize<List<Speciality>>(json, options);
-            if (specialities != null)
+            var dtos = JsonSerializer.Deserialize<List<SpecialityDto>>(json, options);
+
+            if (dtos != null)
             {
-                _specialities.AddRange(specialities);
+                foreach (var dto in dtos)
+                {
+                    _specialities.Add(new Speciality(dto.Name, dto.Description, dto.Id));
+                }
             }
         }
         catch (Exception ex)
@@ -35,7 +42,6 @@ public class PersistenceInMemory : IPersistence
     public Speciality? GetSpecialityById(Guid id) => _specialities.FirstOrDefault(s => s.Id == id);
 
     public List<Doctor> GetAllDoctors() => _doctors;
-
     public Doctor? GetDoctorById(Guid id) => _doctors.FirstOrDefault(d => d.Id == id);
 
     public void AddDoctor(Doctor doctor)
@@ -50,10 +56,5 @@ public class PersistenceInMemory : IPersistence
         {
             _doctors[index] = doctor;
         }
-    }
-
-    public Speciality? GetSpecialityByld(Guid id)
-    {
-        throw new NotImplementedException();
     }
 }

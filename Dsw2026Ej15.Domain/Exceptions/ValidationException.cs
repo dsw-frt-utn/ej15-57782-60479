@@ -4,8 +4,6 @@ using System.Text;
 
 namespace Dsw2026Ej15.Domain.Exceptions
 {
-    internal class ValidarException
-    {
 
         public class ValidationException : Exception
         {
@@ -14,4 +12,4 @@ namespace Dsw2026Ej15.Domain.Exceptions
             }
         }
     }
-}
+
