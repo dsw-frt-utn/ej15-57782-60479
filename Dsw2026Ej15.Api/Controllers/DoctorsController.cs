@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Dsw2026Ej15.Domain.Entities;
-using Dsw2026Ej15.Domain.Interfaces;
+﻿using Dsw2026Ej15.Domain.Entities;
 using Dsw2026Ej15.Domain.Exceptions;
+using Dsw2026Ej15.Domain.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using static Dsw2026Ej15.Api.Models.DoctorModel;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
     private readonly IPersistence _persistence;
@@ -19,6 +20,7 @@ public class DoctorsController : ControllerBase
     [HttpPost]
     public IActionResult CreateDoctor([FromBody] Doctor doctor)
     {
+        
         if (string.IsNullOrWhiteSpace(doctor.Name))
             throw new ValidationException("El nombre del médico es un campo obligatorio.");
 
