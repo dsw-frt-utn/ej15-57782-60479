@@ -8,7 +8,7 @@ namespace Dsw2026Ej15.Domain.Entities
 {
         public string Name { get; set; }
         public string Description { get; set; }
-
+        protected Speciality() { }
     public Speciality(string name, string description, Guid? id = null) : base(id)
 
     {
